@@ -3,7 +3,13 @@
     <head>
         <title>Calculator</title>
 <style>
-    table, input {
+    table {
+        font-size: 50px;
+        border-spacing: 15px;
+        border: 1px solid black;
+        padding: 5px;
+    }
+    input {
         font-size: 50px;
     }
     select {
@@ -20,6 +26,15 @@ function calcPositionSize()
     var entry = parseFloat(f.elements["entry"].value);
     var target = parseFloat(f.elements["take_profit"].value);
     var stop = parseFloat(f.elements["stop_loss"].value);
+
+    console.log(equity); 
+
+    // Only calculate if everything is filled
+    if (isNaN(equity) || isNaN(risk) || isNaN(entry) || isNaN(target) || isNaN(stop))
+    {
+        document.getElementById('result').innerHTML = "";
+        return
+    }
 
     // Calculate max loss
     var stopCost = equity * risk / 100;
@@ -68,7 +83,6 @@ function calcPositionSize()
     var tds = document.getElementsByTagName("td");
     for(var i = 0, j = tds.length; i < j; ++i)
         tds[i].style.color = textColor;
-
 }
 
 function roundNumber(number, precision){
