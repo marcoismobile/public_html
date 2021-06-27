@@ -27,9 +27,7 @@ function calcPositionSize()
     var target = parseFloat(f.elements["take_profit"].value);
     var stop = parseFloat(f.elements["stop_loss"].value);
 
-    console.log(equity); 
-
-    // Only calculate if everything is filled
+    // Only calculate if everything is filled in
     if (isNaN(equity) || isNaN(risk) || isNaN(entry) || isNaN(target) || isNaN(stop))
     {
         document.getElementById('result').innerHTML = "";
@@ -39,7 +37,7 @@ function calcPositionSize()
     // Calculate max loss
     var stopCost = equity * risk / 100;
 
-    if (f.elements["type"].value == 1)
+    if (entry < target)
     {
         // LONG POSITION
         var positionSize = stopCost / (entry - stop);
@@ -102,15 +100,6 @@ function roundNumber(number, precision){
                 </tr>
                 <tr>
                     <td>Risk:</td><td><input id="risk" type="text" size="1" value="1"> %</td>
-                </tr>
-                <tr>
-                    <td>Type:</td>
-                    <td>
-                        <select id="type"> 
-                            <option value="1" selected="selected">Long</option>
-                            <option value="2">Short</option>
-                        </select>
-                    </td>
                 </tr>
                 <tr>
                     <td>Entry:</td><td><input id="entry" type="text" size="6" value=""> $</td>
