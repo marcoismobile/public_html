@@ -2,7 +2,14 @@
 <html>
     <head>
         <title>Calculator</title>
-
+<style>
+    table, input {
+        font-size: 50px;
+    }
+    select {
+        font-size: 40px;
+    }
+</style>
 <script>
 function calcPositionSize()
 {
@@ -77,10 +84,10 @@ function roundNumber(number, precision){
 		<form id="calculator" method="post" action="" onsubmit="return false;">
             <table>
                 <tr>
-                    <td>Equity:</td><td><input id="equity" type="text" size="8" value=""> $</td>
+                    <td>Equity:</td><td><input id="equity" type="text" size="6" value=""> $</td>
                 </tr>
                 <tr>
-                    <td>Risk:</td><td><input id="risk" type="text" size="3" value="1"> %</td>
+                    <td>Risk:</td><td><input id="risk" type="text" size="1" value="1"> %</td>
                 </tr>
                 <tr>
                     <td>Type:</td>
@@ -92,13 +99,16 @@ function roundNumber(number, precision){
                     </td>
                 </tr>
                 <tr>
-                    <td>Entry:</td><td><input id="entry" type="text" size="8" value=""> $</td>
+                    <td>Entry:</td><td><input id="entry" type="text" size="6" value=""> $</td>
                 </tr>
                 <tr>
-                    <td>Take Profit:</td><td><input id="take_profit" type="text" size="8" value=""> $</td>
+                    <td>Take Profit:</td><td><input id="take_profit" type="text" size="6" value=""> $</td>
                 </tr>
                 <tr>
-                    <td>Stop Loss:</td><td><input id="stop_loss" type="text" size="8" value=""> $</td>
+                    <td>Stop Loss:</td><td><input id="stop_loss" type="text" size="6" value=""> $</td>
+                </tr>
+                <tr>
+                    <td colspan="2">&nbsp;</td>
                 </tr>
                 <tr>
                     <td colspan="2"><input type="submit" value="Calculate" onclick="calcPositionSize()"></td>
