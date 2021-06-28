@@ -6,32 +6,60 @@
     table {
         font-size: 50px;
         border-spacing: 15px;
-        border: 1px solid black;
+        border: 2px solid black;
         padding: 5px;
     }
     input {
         font-size: 50px;
+        border: 2px solid black;
     }
     select {
-        font-size: 40px;
+        font-size: 50px;
+        border: 2px solid black;
     }
 </style>
 <script>
 function calcPositionSize()
 {
+    // Defaults
+    var tp_perc = 1
+    var sl_perc = 0.5
+
     // Get values from form
     var f = document.forms["calculator"];
     var equity = parseFloat(f.elements["equity"].value);
     var risk = parseFloat(f.elements["risk"].value);
+    var type = parseFloat(f.elements["type"].value);
     var entry = parseFloat(f.elements["entry"].value);
     var target = parseFloat(f.elements["take_profit"].value);
     var stop = parseFloat(f.elements["stop_loss"].value);
 
     // Only calculate if everything is filled in
-    if (isNaN(equity) || isNaN(risk) || isNaN(entry) || isNaN(target) || isNaN(stop))
+    if (isNaN(equity) || isNaN(risk) || isNaN(entry))
     {
         document.getElementById('result').innerHTML = "";
         return
+    }
+
+    if (isNaN(target) && isNaN(stop))
+    {
+        // LONG
+        if (type == 1)
+        {
+            target = entry * (1.0 + tp_perc / 100)
+            f.elements["take_profit"].value = roundNumber(target, 2)
+            stop = entry * (1.0 - sl_perc / 100)
+            f.elements["stop_loss"].value = roundNumber(stop, 2)
+        }
+
+        // SHORT
+        if (type == 2)
+        {
+            target = entry * (1.0 - tp_perc / 100)
+            f.elements["take_profit"].value = roundNumber(target, 2)
+            stop = entry * (1.0 + sl_perc / 100)
+            f.elements["stop_loss"].value = roundNumber(stop, 2)
+        }
     }
 
     // Calculate max loss
@@ -54,20 +82,11 @@ function calcPositionSize()
     // Calculate leverage
     var leverage = positionSize * entry / equity
 
-	var result = "POSITION:\t$" + roundNumber(positionSize * entry, 2 ) + " (BASE: " + roundNumber(positionSize, 9) + ") [" + roundNumber(leverage, 2) + "x]<br>" +
-           "LOSS:\t\t$" + roundNumber(stopCost, 5) + "<br>" +
-           "PROFIT:\t\t$" + roundNumber(targetGain, 5) + "<br>" +
-           "RR:\t\t\t" + roundNumber(rrRatio, 2) + "x";
-    
-    var result = "<table>" +
-                "<tr><td>POSITION:</td><td>$ " + roundNumber(positionSize * entry, 2 ) + " (BASE: " + roundNumber(positionSize, 9) + ") [" + roundNumber(leverage, 2) + "x]</td></tr>" +
-                "<tr><td>PROFIT:</td><td>$ " + roundNumber(targetGain, 5) + "</td></tr>" +
-                "<tr><td>LOSS:</td><td>$ " + roundNumber(stopCost, 5) + "</td></tr>" +
-                "<tr><td>RR:</td><td>" + roundNumber(rrRatio, 2) + "x</td></tr>"
-                "</table>"
-    
-    // Show result
-    document.getElementById('result').innerHTML = result;
+    // Generate result
+    document.getElementById('result_position').innerHTML = "$ " + roundNumber(positionSize * entry, 2 ) + " [" + roundNumber(leverage, 2) + "x]<br>(" + roundNumber(positionSize, 5) + ")";
+    document.getElementById('result_profit').innerHTML = "$ " + roundNumber(targetGain, 2);
+    document.getElementById('result_loss').innerHTML = "$ " + roundNumber(stopCost, 2);
+    document.getElementById('result_rr').innerHTML = roundNumber(rrRatio, 2) + "x";
 
     // Change text color according to RR ratio
     var textColor;
@@ -78,9 +97,9 @@ function calcPositionSize()
     } else {
         textColor = 'green';
     }
-    var tds = document.getElementsByTagName("td");
-    for(var i = 0, j = tds.length; i < j; ++i)
-        tds[i].style.color = textColor;
+    var results = document.getElementsByClassName("result")
+    for(var i = 0, j = results.length; i < j; ++i)
+        results[i].style.color = textColor;
 }
 
 function roundNumber(number, precision){
@@ -96,28 +115,53 @@ function roundNumber(number, precision){
 		<form id="calculator" method="post" action="" onsubmit="return false;">
             <table>
                 <tr>
-                    <td>Equity:</td><td><input id="equity" type="text" size="6" value=""> $</td>
+                    <td>Equity:</td><td><input class="input" id="equity" type="text" size="6" value=""> $</td>
                 </tr>
                 <tr>
-                    <td>Risk:</td><td><input id="risk" type="text" size="1" value="1"> %</td>
+                    <td>Risk:</td><td><input class="input" id="risk" type="text" size="1" value="1"> %</td>
                 </tr>
                 <tr>
-                    <td>Entry:</td><td><input id="entry" type="text" size="6" value=""> $</td>
+                    <td>Type:</td>
+                    <td>
+                        <select class="input" id="type"> 
+                            <option value="0" selected="selected"></option>
+                            <option value="1">Long</option>
+                            <option value="2">Short</option>
+                        </select>
+                    </td>
                 </tr>
                 <tr>
-                    <td>Take Profit:</td><td><input id="take_profit" type="text" size="6" value=""> $</td>
+                    <td>Entry:</td><td><input class="input" id="entry" type="text" size="6" value=""> $</td>
                 </tr>
                 <tr>
-                    <td>Stop Loss:</td><td><input id="stop_loss" type="text" size="6" value=""> $</td>
+                    <td>TP:</td><td><input class="input" id="take_profit" type="text" size="6" value=""> $</td>
+                </tr>
+                <tr>
+                    <td>SL:</td><td><input class="input" id="stop_loss" type="text" size="6" value=""> $</td>
                 </tr>
                 <tr>
                     <td colspan="2">&nbsp;</td>
                 </tr>
                 <tr>
-                    <td colspan="2"><input type="submit" value="Calculate" onclick="calcPositionSize()"></td>
+                    <td style="vertical-align:top">POSITION:</td><td><div class="result" id="result_position"></div></td>
+                </tr>
+                <tr>
+                    <td>PROFIT:</td><td><div class="result" id="result_profit"></div></td>
+                </tr>
+                <tr>
+                    <td>LOSS:</td><td><div class="result" id="result_loss"></div></td>
+                </tr>
+                <tr>
+                    <td>RR:</td><td><div class="result" id="result_rr"></div></td>
+                </tr>
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td><input type="submit" value="Calculate" onclick="calcPositionSize()"></td>
+                    <td><input type="reset" value="Reset"></td>
                 </tr>
             </table>
 		</form>	
-		<div id="result"></div>
     </body>
 </html>
